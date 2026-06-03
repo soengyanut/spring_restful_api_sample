@@ -2,6 +2,7 @@ package co.istad.productapisimpledemo.service;
 
 import co.istad.productapisimpledemo.dto.ProductRequest;
 import co.istad.productapisimpledemo.dto.ProductResponse;
+import co.istad.productapisimpledemo.dto.UpdateProductRequest;
 import co.istad.productapisimpledemo.entity.Product;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.List;
 public interface ProductService {
     ProductResponse createProduct(ProductRequest product);
     List<ProductResponse> findAllProducts();
-    ProductResponse updateProduct(ProductRequest product);
-    boolean deleteProduct(int id);
+    ProductResponse findProductById(Integer id);
+    ProductResponse updateProduct(Integer id, UpdateProductRequest request);
+    boolean deleteProduct(Integer id);
 }
