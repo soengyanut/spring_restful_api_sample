@@ -1,1 +1,14 @@
-spring.application.name=product-api-simple-demo
+spring:
+    application:
+      name: product-api-simple-demo
+    datasource:
+      url: jdbc:postgresql://localhost:5433/ecom_db
+      username: postgres
+      password: postgres@istad
+    jpa:
+      hibernate:
+        ddl-auto: update     # create | update | none
+      show-sql: true          # log generated SQL
+      properties:
+        hibernate:
+          format_sql: true
