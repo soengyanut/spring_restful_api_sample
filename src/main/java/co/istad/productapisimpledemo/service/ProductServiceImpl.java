@@ -4,21 +4,25 @@ import co.istad.productapisimpledemo.dto.ProductResponse;
 import co.istad.productapisimpledemo.dto.UpdateProductRequest;
 import co.istad.productapisimpledemo.entity.Product;
 import co.istad.productapisimpledemo.repository.ProductRepository;
+import co.istad.productapisimpledemo.repository.ProductRepositoryOld;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultLifecycleProcessor;
+import org.springframework.data.repository.core.support.RepositoryMethodInvocationListener;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ProductServiceImpl implements ProductService {
     // inject the repository here
-    private final ProductRepository productRepository;
-    private final DefaultLifecycleProcessor defaultLifecycleProcessor;
-    private Integer nextId = 1004;
-    // mapToEntity
+    //private final ProductRepositoryOld productRepositoryOld;
+   private final ProductRepository productRepository;
+
+
     private Product mapToEntity(ProductRequest request) {
         Product product = new Product();
         product.setName(request.name());
@@ -43,14 +47,16 @@ public class ProductServiceImpl implements ProductService {
         var product = mapToEntity(request);
         // set static userID
         product.setUserId(1);
-        product.setId(nextId++);
-        return mapToResponse(productRepository.createProduct(product));
+      // insert the data to the table only need to
+        // repository.save(entity) = insert
+        return mapToResponse(productRepository.save(product));
 
     }
 
     @Override
     public List<ProductResponse> findAllProducts() {
-      return productRepository.getAllProducts()
+        // repository.findAll()
+      return productRepository.findAll()
               .stream()
               .map(this::mapToResponse)
               .toList();
@@ -58,25 +64,18 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse findProductById(Integer id) {
-       var product =   productRepository.findProductById(id);
-       if(product == null) {
-           // throw not found exception, but skip it for now
-           log.info("Product with id {} not found", id);
-           return null;
-       }
+       var product =  productRepository.findById(id)
+               .orElseThrow(()-> new NoSuchElementException("Product with ID = "+id+" not found"));
+
         return mapToResponse(product);
     }
 
     @Override
     public ProductResponse updateProduct(Integer id , UpdateProductRequest request) {
         // find existing product
-        var existingProduct = productRepository.findProductById(id);
+        // repository.findById
+        var existingProduct = productRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Product with ID = "+id+" not found"));
 
-        if(existingProduct == null) {
-            log.info("Product with id {} not found", id);
-            // throw exception
-            return null;
-        }
         if(request.name()!=null)
             existingProduct.setName(request.name());
         if(request.description()!=null)
@@ -84,13 +83,21 @@ public class ProductServiceImpl implements ProductService {
         if(request.price()!=null)
             existingProduct.setPrice(request.price());
         // update product
-        productRepository.updateProduct(existingProduct);
+        productRepository.save(existingProduct);
         return mapToResponse(existingProduct);
     }
 
 
     @Override
     public boolean deleteProduct(Integer id) {
+        // find if the product exist
+        // if it's we delete it and return true
+        // else return false
+
+        if(productRepository.existsById(id)) {
+            productRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 
