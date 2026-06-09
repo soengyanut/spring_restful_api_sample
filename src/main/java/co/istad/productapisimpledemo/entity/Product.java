@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
+import java.nio.channels.FileLock;
 
 
 @AllArgsConstructor
@@ -18,10 +19,10 @@ import lombok.*;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     private String name;
     private String description;
-    private float price;
-    private int userId; // user that create the product !
+    private Float price;
+    private Integer userId; // user that create the product !
 
 }
