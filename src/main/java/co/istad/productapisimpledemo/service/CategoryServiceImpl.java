@@ -2,20 +2,26 @@ package co.istad.productapisimpledemo.service;
 
 import co.istad.productapisimpledemo.dto.CategoryRequest;
 import co.istad.productapisimpledemo.dto.CategoryResponse;
+import co.istad.productapisimpledemo.entity.Category;
+import co.istad.productapisimpledemo.mapper.CategoryMapper;
 import co.istad.productapisimpledemo.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
+import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
+    private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
+
     @Override
     public CategoryResponse createCategory(CategoryRequest request) {
-        return null;
+        Category category = categoryMapper.toEntity(request);
+        // TODO: check if the name already exist
+        var newCategory = categoryRepository.save(category);
+        return categoryMapper.toResponse(newCategory);
     }
 
     @Override
@@ -30,7 +36,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryResponse> findAll() {
-        return List.of();
+        return categoryRepository.findAll()
+                .stream()
+                .map(categoryMapper::toResponse)
+                .toList();
     }
 
     @Override
