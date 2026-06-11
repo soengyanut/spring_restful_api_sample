@@ -19,7 +19,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse createCategory(CategoryRequest request) {
         Category category = categoryMapper.toEntity(request);
-        // TODO: check if the name already exist
         var newCategory = categoryRepository.save(category);
         return categoryMapper.toResponse(newCategory);
     }
